@@ -3,9 +3,13 @@
   "version": "0.3.0",
   "description": "TypeScript SDK for AgentAnycast — A2A protocol over P2P",
   "license": "Apache-2.0",
+  "homepage": "https://github.com/AgentAnycast/agentanycast",
   "repository": {
     "type": "git",
     "url": "https://github.com/AgentAnycast/agentanycast-ts"
+  },
+  "bugs": {
+    "url": "https://github.com/AgentAnycast/agentanycast/issues"
   },
   "keywords": [
     "a2a",
