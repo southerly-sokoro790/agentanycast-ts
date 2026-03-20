@@ -72,6 +72,8 @@ export interface DiscoverBySkillRequest {
   tags: { [key: string]: string };
   /** max results (0 = server default) */
   limit: number;
+  /** include federated entries from peer relays */
+  federated: boolean;
 }
 
 export interface DiscoverBySkillRequest_TagsEntry {
@@ -760,7 +762,7 @@ export const UnregisterSkillsResponse: MessageFns<UnregisterSkillsResponse> = {
 };
 
 function createBaseDiscoverBySkillRequest(): DiscoverBySkillRequest {
-  return { skillId: "", tags: {}, limit: 0 };
+  return { skillId: "", tags: {}, limit: 0, federated: false };
 }
 
 export const DiscoverBySkillRequest: MessageFns<DiscoverBySkillRequest> = {
@@ -773,6 +775,9 @@ export const DiscoverBySkillRequest: MessageFns<DiscoverBySkillRequest> = {
     });
     if (message.limit !== 0) {
       writer.uint32(24).int32(message.limit);
+    }
+    if (message.federated !== false) {
+      writer.uint32(32).bool(message.federated);
     }
     return writer;
   },
@@ -811,6 +816,14 @@ export const DiscoverBySkillRequest: MessageFns<DiscoverBySkillRequest> = {
           message.limit = reader.int32();
           continue;
         }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.federated = reader.bool();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -837,6 +850,7 @@ export const DiscoverBySkillRequest: MessageFns<DiscoverBySkillRequest> = {
         )
         : {},
       limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
+      federated: isSet(object.federated) ? globalThis.Boolean(object.federated) : false,
     };
   },
 
@@ -857,6 +871,9 @@ export const DiscoverBySkillRequest: MessageFns<DiscoverBySkillRequest> = {
     if (message.limit !== 0) {
       obj.limit = Math.round(message.limit);
     }
+    if (message.federated !== false) {
+      obj.federated = message.federated;
+    }
     return obj;
   },
 
@@ -876,6 +893,7 @@ export const DiscoverBySkillRequest: MessageFns<DiscoverBySkillRequest> = {
       {},
     );
     message.limit = object.limit ?? 0;
+    message.federated = object.federated ?? false;
     return message;
   },
 };

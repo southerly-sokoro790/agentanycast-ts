@@ -297,6 +297,12 @@ export interface A2AEnvelope {
     | { $case: "streamChunk"; streamChunk: StreamChunk }
     | { $case: "streamEnd"; streamEnd: StreamEnd }
     | undefined;
+  /**
+   * W3C Trace Context for distributed tracing (v0.7).
+   * See https://www.w3.org/TR/trace-context/
+   */
+  traceParent: string;
+  traceState: string;
 }
 
 export interface SendTaskPayload {
@@ -1325,7 +1331,7 @@ export const Artifact: MessageFns<Artifact> = {
 };
 
 function createBaseA2AEnvelope(): A2AEnvelope {
-  return { envelopeId: "", type: 0, timestamp: undefined, payload: undefined };
+  return { envelopeId: "", type: 0, timestamp: undefined, payload: undefined, traceParent: "", traceState: "" };
 }
 
 export const A2AEnvelope: MessageFns<A2AEnvelope> = {
@@ -1373,6 +1379,12 @@ export const A2AEnvelope: MessageFns<A2AEnvelope> = {
       case "streamEnd":
         StreamEnd.encode(message.payload.streamEnd, writer.uint32(162).fork()).join();
         break;
+    }
+    if (message.traceParent !== "") {
+      writer.uint32(242).string(message.traceParent);
+    }
+    if (message.traceState !== "") {
+      writer.uint32(250).string(message.traceState);
     }
     return writer;
   },
@@ -1505,6 +1517,22 @@ export const A2AEnvelope: MessageFns<A2AEnvelope> = {
           message.payload = { $case: "streamEnd", streamEnd: StreamEnd.decode(reader, reader.uint32()) };
           continue;
         }
+        case 30: {
+          if (tag !== 242) {
+            break;
+          }
+
+          message.traceParent = reader.string();
+          continue;
+        }
+        case 31: {
+          if (tag !== 250) {
+            break;
+          }
+
+          message.traceState = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1566,6 +1594,16 @@ export const A2AEnvelope: MessageFns<A2AEnvelope> = {
         : isSet(object.stream_end)
         ? { $case: "streamEnd", streamEnd: StreamEnd.fromJSON(object.stream_end) }
         : undefined,
+      traceParent: isSet(object.traceParent)
+        ? globalThis.String(object.traceParent)
+        : isSet(object.trace_parent)
+        ? globalThis.String(object.trace_parent)
+        : "",
+      traceState: isSet(object.traceState)
+        ? globalThis.String(object.traceState)
+        : isSet(object.trace_state)
+        ? globalThis.String(object.trace_state)
+        : "",
     };
   },
 
@@ -1602,6 +1640,12 @@ export const A2AEnvelope: MessageFns<A2AEnvelope> = {
       obj.streamChunk = StreamChunk.toJSON(message.payload.streamChunk);
     } else if (message.payload?.$case === "streamEnd") {
       obj.streamEnd = StreamEnd.toJSON(message.payload.streamEnd);
+    }
+    if (message.traceParent !== "") {
+      obj.traceParent = message.traceParent;
+    }
+    if (message.traceState !== "") {
+      obj.traceState = message.traceState;
     }
     return obj;
   },
@@ -1694,6 +1738,8 @@ export const A2AEnvelope: MessageFns<A2AEnvelope> = {
         break;
       }
     }
+    message.traceParent = object.traceParent ?? "";
+    message.traceState = object.traceState ?? "";
     return message;
   },
 };

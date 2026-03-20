@@ -51,11 +51,11 @@ export interface P2PExtension {
    * DID-based ecosystems such as ANP.
    */
   didKey: string;
-  /** Optional did:web identifier for HTTPS-based DID resolution. */
+  /** Optional did:web identifier for web-based DID resolution. */
   didWeb: string;
   /** Optional did:dns domain for DNS-based DID resolution. */
   didDns: string;
-  /** JSON-encoded Verifiable Credentials associated with this agent. */
+  /** Optional JSON-encoded Verifiable Credentials. */
   verifiableCredentials: string[];
 }
 
@@ -326,7 +326,15 @@ export const Skill: MessageFns<Skill> = {
 };
 
 function createBaseP2PExtension(): P2PExtension {
-  return { peerId: "", supportedTransports: [], relayAddresses: [], didKey: "", didWeb: "", didDns: "", verifiableCredentials: [] };
+  return {
+    peerId: "",
+    supportedTransports: [],
+    relayAddresses: [],
+    didKey: "",
+    didWeb: "",
+    didDns: "",
+    verifiableCredentials: [],
+  };
 }
 
 export const P2PExtension: MessageFns<P2PExtension> = {
