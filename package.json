@@ -9,7 +9,8 @@
     "url": "git+https://github.com/AgentAnycast/agentanycast-ts.git"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "mcpName": "io.github.AgentAnycast/agentanycast",
   "bugs": {

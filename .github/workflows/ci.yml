@@ -20,7 +20,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Checkout proto repo
         uses: actions/checkout@v4
@@ -29,12 +29,12 @@ jobs:
           path: agentanycast-proto
 
       - name: Install ts-proto
-        run: cd agentanycast-proto && npm install ts-proto
+        working-directory: agentanycast-proto
+        run: npm init -y && npm install ts-proto
 
       - name: Regenerate TypeScript stubs
-        run: |
-          cd agentanycast-proto
-          PATH="$PWD/node_modules/.bin:$PATH" buf generate
+        working-directory: agentanycast-proto
+        run: PATH="$PWD/node_modules/.bin:$PATH" buf generate
 
       - name: Check for differences
         run: |
