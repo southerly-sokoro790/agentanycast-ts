@@ -34,10 +34,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          registry-url: https://registry.npmjs.org
 
       - name: Upgrade npm for trusted publishing
         run: npm install -g npm@latest
+
+      - name: Configure npm registry (no auth token for OIDC)
+        run: npm config set registry https://registry.npmjs.org/
 
       - run: AGENTANYCAST_SKIP_DOWNLOAD=1 npm ci
 
