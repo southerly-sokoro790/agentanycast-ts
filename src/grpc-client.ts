@@ -26,6 +26,10 @@ import type {
   GetNodeInfoRequest,
   GetNodeInfoResponse,
   SetAgentCardRequest,
+  ConnectPeerRequest,
+  ConnectPeerResponse,
+  ListPeersRequest,
+  ListPeersResponse,
   GetPeerCardRequest,
   GetPeerCardResponse,
   SendTaskRequest,
@@ -233,6 +237,12 @@ export interface NodeInfo {
   version: string;
 }
 
+export interface PeerInfo {
+  peerId: string;
+  addresses: string[];
+  connectionType: number;
+}
+
 export interface DiscoveredAgent {
   peerId: string;
   agentName: string;
@@ -304,6 +314,37 @@ export class GrpcClient {
   }
 
   // ── Peer Management ──────────────────────────────────────
+
+  async connectPeer(peerId: string, addresses?: string[]): Promise<PeerInfo> {
+    const client = this._ensure();
+    try {
+      const resp = await promisify<ConnectPeerRequest, ConnectPeerResponse>(
+        client.connectPeer, client,
+      )({ peerId, addresses: addresses ?? [] });
+      const info = resp.peerInfo!;
+      return {
+        peerId: info.peerId,
+        addresses: info.addresses,
+        connectionType: info.connectionType,
+      };
+    } catch (err) {
+      const e = err as ServiceError;
+      if (e.code === status.NOT_FOUND) throw new PeerNotFoundError(`Peer not found: ${peerId}`);
+      throw err;
+    }
+  }
+
+  async listPeers(): Promise<PeerInfo[]> {
+    const client = this._ensure();
+    const resp = await promisify<ListPeersRequest, ListPeersResponse>(
+      client.listPeers, client,
+    )({});
+    return resp.peers.map((p) => ({
+      peerId: p.peerId,
+      addresses: p.addresses,
+      connectionType: p.connectionType,
+    }));
+  }
 
   async getPeerCard(peerId: string): Promise<AgentCard> {
     const client = this._ensure();
