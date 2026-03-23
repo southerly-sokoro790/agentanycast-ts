@@ -372,6 +372,7 @@ export class GrpcClient {
       message: sdkMessageToProto(message),
       metadata: metadata ?? {},
       target: undefined,
+      transportHint: "",
     };
     if (target.peerId) req.target = { $case: "peerId", peerId: target.peerId };
     else if (target.skill) req.target = { $case: "skillId", skillId: target.skill };
