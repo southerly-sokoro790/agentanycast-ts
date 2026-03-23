@@ -42,6 +42,16 @@ export interface NodeOptions {
   daemonPath?: string;
   /** Data directory for daemon state. */
   home?: string;
+  /**
+   * Transport specification for the daemon (e.g., "nats://broker:4222", "auto", "libp2p").
+   * When undefined, defaults to libp2p.
+   */
+  transport?: string;
+  /**
+   * Namespace for multi-tenant isolation.
+   * When undefined, defaults to "default".
+   */
+  namespace?: string;
 }
 
 export class Node {
@@ -51,6 +61,8 @@ export class Node {
   private readonly _daemonAddr?: string;
   private readonly _daemonPath?: string;
   private readonly _home?: string;
+  private readonly _transport?: string;
+  private readonly _namespace?: string;
 
   private _daemon?: DaemonManager;
   private _grpc?: GrpcClient;
@@ -67,6 +79,8 @@ export class Node {
     this._daemonAddr = options.daemonAddr;
     this._daemonPath = options.daemonPath;
     this._home = options.home;
+    this._transport = options.transport;
+    this._namespace = options.namespace;
   }
 
   /** This node's PeerID (available after start). */
@@ -93,6 +107,8 @@ export class Node {
         keyPath: this._keyPath,
         relay: this._relay,
         home: this._home,
+        transport: this._transport,
+        namespace: this._namespace,
       };
       this._daemon = new DaemonManager(daemonOpts);
       await this._daemon.start();

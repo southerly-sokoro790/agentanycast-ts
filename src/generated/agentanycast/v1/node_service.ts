@@ -30,6 +30,40 @@ import { StreamChunk, StreamEnd, StreamStart } from "./streaming";
 
 export const protobufPackage = "agentanycast.v1";
 
+/**
+ * StartNodeRequest configures the daemon at startup time.
+ * SDKs populate this before launching the daemon process.
+ */
+export interface StartNodeRequest {
+  /** Agent card to register on start. */
+  card?:
+    | AgentCard
+    | undefined;
+  /** Relay server multiaddr for cross-network communication. */
+  relay: string;
+  /** Path to the libp2p identity key file. */
+  keyPath: string;
+  /** gRPC listen address (e.g., "unix:///tmp/daemon.sock"). */
+  grpcListen: string;
+  /** Log level for the daemon (e.g., "info", "debug"). */
+  logLevel: string;
+  /**
+   * Optional transport specification (e.g., "nats://broker:4222", "auto", "libp2p").
+   * When empty, defaults to libp2p.
+   */
+  transport: string;
+  /**
+   * Optional namespace for multi-tenant isolation.
+   * When empty, defaults to "default".
+   */
+  namespace: string;
+}
+
+/** StartNodeResponse is returned after the daemon starts successfully. */
+export interface StartNodeResponse {
+  nodeInfo?: NodeInfo | undefined;
+}
+
 export interface GetNodeInfoRequest {
 }
 
@@ -84,6 +118,13 @@ export interface SendTaskRequest {
     | undefined;
   message?: Message | undefined;
   metadata: { [key: string]: string };
+  /**
+   * Transport hint for multi-transport routing (v0.8).
+   * When set, the daemon prefers the specified transport for delivery.
+   * Examples: "nats://broker:4222", "ws://gateway:8080", "auto" (default).
+   * If empty or "auto", the daemon selects the best transport automatically.
+   */
+  transportHint: string;
 }
 
 export interface SendTaskRequest_MetadataEntry {
@@ -210,6 +251,240 @@ export interface DiscoveredAgent {
   agentDescription: string;
   skills: SkillInfo[];
 }
+
+function createBaseStartNodeRequest(): StartNodeRequest {
+  return { card: undefined, relay: "", keyPath: "", grpcListen: "", logLevel: "", transport: "", namespace: "" };
+}
+
+export const StartNodeRequest: MessageFns<StartNodeRequest> = {
+  encode(message: StartNodeRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.card !== undefined) {
+      AgentCard.encode(message.card, writer.uint32(10).fork()).join();
+    }
+    if (message.relay !== "") {
+      writer.uint32(18).string(message.relay);
+    }
+    if (message.keyPath !== "") {
+      writer.uint32(26).string(message.keyPath);
+    }
+    if (message.grpcListen !== "") {
+      writer.uint32(34).string(message.grpcListen);
+    }
+    if (message.logLevel !== "") {
+      writer.uint32(42).string(message.logLevel);
+    }
+    if (message.transport !== "") {
+      writer.uint32(82).string(message.transport);
+    }
+    if (message.namespace !== "") {
+      writer.uint32(90).string(message.namespace);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): StartNodeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseStartNodeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.card = AgentCard.decode(reader, reader.uint32());
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.relay = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.keyPath = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.grpcListen = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.logLevel = reader.string();
+          continue;
+        }
+        case 10: {
+          if (tag !== 82) {
+            break;
+          }
+
+          message.transport = reader.string();
+          continue;
+        }
+        case 11: {
+          if (tag !== 90) {
+            break;
+          }
+
+          message.namespace = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): StartNodeRequest {
+    return {
+      card: isSet(object.card) ? AgentCard.fromJSON(object.card) : undefined,
+      relay: isSet(object.relay) ? globalThis.String(object.relay) : "",
+      keyPath: isSet(object.keyPath)
+        ? globalThis.String(object.keyPath)
+        : isSet(object.key_path)
+        ? globalThis.String(object.key_path)
+        : "",
+      grpcListen: isSet(object.grpcListen)
+        ? globalThis.String(object.grpcListen)
+        : isSet(object.grpc_listen)
+        ? globalThis.String(object.grpc_listen)
+        : "",
+      logLevel: isSet(object.logLevel)
+        ? globalThis.String(object.logLevel)
+        : isSet(object.log_level)
+        ? globalThis.String(object.log_level)
+        : "",
+      transport: isSet(object.transport) ? globalThis.String(object.transport) : "",
+      namespace: isSet(object.namespace) ? globalThis.String(object.namespace) : "",
+    };
+  },
+
+  toJSON(message: StartNodeRequest): unknown {
+    const obj: any = {};
+    if (message.card !== undefined) {
+      obj.card = AgentCard.toJSON(message.card);
+    }
+    if (message.relay !== "") {
+      obj.relay = message.relay;
+    }
+    if (message.keyPath !== "") {
+      obj.keyPath = message.keyPath;
+    }
+    if (message.grpcListen !== "") {
+      obj.grpcListen = message.grpcListen;
+    }
+    if (message.logLevel !== "") {
+      obj.logLevel = message.logLevel;
+    }
+    if (message.transport !== "") {
+      obj.transport = message.transport;
+    }
+    if (message.namespace !== "") {
+      obj.namespace = message.namespace;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<StartNodeRequest>, I>>(base?: I): StartNodeRequest {
+    return StartNodeRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<StartNodeRequest>, I>>(object: I): StartNodeRequest {
+    const message = createBaseStartNodeRequest();
+    message.card = (object.card !== undefined && object.card !== null) ? AgentCard.fromPartial(object.card) : undefined;
+    message.relay = object.relay ?? "";
+    message.keyPath = object.keyPath ?? "";
+    message.grpcListen = object.grpcListen ?? "";
+    message.logLevel = object.logLevel ?? "";
+    message.transport = object.transport ?? "";
+    message.namespace = object.namespace ?? "";
+    return message;
+  },
+};
+
+function createBaseStartNodeResponse(): StartNodeResponse {
+  return { nodeInfo: undefined };
+}
+
+export const StartNodeResponse: MessageFns<StartNodeResponse> = {
+  encode(message: StartNodeResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.nodeInfo !== undefined) {
+      NodeInfo.encode(message.nodeInfo, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): StartNodeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseStartNodeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.nodeInfo = NodeInfo.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): StartNodeResponse {
+    return {
+      nodeInfo: isSet(object.nodeInfo)
+        ? NodeInfo.fromJSON(object.nodeInfo)
+        : isSet(object.node_info)
+        ? NodeInfo.fromJSON(object.node_info)
+        : undefined,
+    };
+  },
+
+  toJSON(message: StartNodeResponse): unknown {
+    const obj: any = {};
+    if (message.nodeInfo !== undefined) {
+      obj.nodeInfo = NodeInfo.toJSON(message.nodeInfo);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<StartNodeResponse>, I>>(base?: I): StartNodeResponse {
+    return StartNodeResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<StartNodeResponse>, I>>(object: I): StartNodeResponse {
+    const message = createBaseStartNodeResponse();
+    message.nodeInfo = (object.nodeInfo !== undefined && object.nodeInfo !== null)
+      ? NodeInfo.fromPartial(object.nodeInfo)
+      : undefined;
+    return message;
+  },
+};
 
 function createBaseGetNodeInfoRequest(): GetNodeInfoRequest {
   return {};
@@ -793,7 +1068,7 @@ export const GetPeerCardResponse: MessageFns<GetPeerCardResponse> = {
 };
 
 function createBaseSendTaskRequest(): SendTaskRequest {
-  return { target: undefined, message: undefined, metadata: {} };
+  return { target: undefined, message: undefined, metadata: {}, transportHint: "" };
 }
 
 export const SendTaskRequest: MessageFns<SendTaskRequest> = {
@@ -815,6 +1090,9 @@ export const SendTaskRequest: MessageFns<SendTaskRequest> = {
     globalThis.Object.entries(message.metadata).forEach(([key, value]: [string, string]) => {
       SendTaskRequest_MetadataEntry.encode({ key: key as any, value }, writer.uint32(90).fork()).join();
     });
+    if (message.transportHint !== "") {
+      writer.uint32(98).string(message.transportHint);
+    }
     return writer;
   },
 
@@ -868,6 +1146,14 @@ export const SendTaskRequest: MessageFns<SendTaskRequest> = {
           }
           continue;
         }
+        case 12: {
+          if (tag !== 98) {
+            break;
+          }
+
+          message.transportHint = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -900,6 +1186,11 @@ export const SendTaskRequest: MessageFns<SendTaskRequest> = {
           {},
         )
         : {},
+      transportHint: isSet(object.transportHint)
+        ? globalThis.String(object.transportHint)
+        : isSet(object.transport_hint)
+        ? globalThis.String(object.transport_hint)
+        : "",
     };
   },
 
@@ -923,6 +1214,9 @@ export const SendTaskRequest: MessageFns<SendTaskRequest> = {
           obj.metadata[k] = v;
         });
       }
+    }
+    if (message.transportHint !== "") {
+      obj.transportHint = message.transportHint;
     }
     return obj;
   },
@@ -964,6 +1258,7 @@ export const SendTaskRequest: MessageFns<SendTaskRequest> = {
       },
       {},
     );
+    message.transportHint = object.transportHint ?? "";
     return message;
   },
 };

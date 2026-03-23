@@ -51,6 +51,10 @@ export interface DaemonManagerOptions {
   logLevel?: string;
   /** Data directory for daemon state. */
   home?: string;
+  /** Transport specification (e.g., "nats://broker:4222", "auto", "libp2p"). */
+  transport?: string;
+  /** Namespace for multi-tenant isolation. */
+  namespace?: string;
 }
 
 export class DaemonManager {
@@ -63,6 +67,8 @@ export class DaemonManager {
   private readonly _grpcListen: string;
   private readonly _relay?: string;
   private readonly _logLevel: string;
+  private readonly _transport?: string;
+  private readonly _namespace?: string;
   private readonly _storePath: string;
   private _process?: ChildProcess;
   private _managed = false;
@@ -77,6 +83,8 @@ export class DaemonManager {
     this._grpcListen = options.grpcListen ?? `unix://${join(this._base, "daemon.sock")}`;
     this._relay = options.relay;
     this._logLevel = options.logLevel ?? "info";
+    this._transport = options.transport;
+    this._namespace = options.namespace;
     this._storePath = join(this._base, "data");
   }
 
@@ -174,6 +182,8 @@ export class DaemonManager {
       `--log-level=${this._logLevel}`,
     ];
     if (this._relay) args.push(`--bootstrap-peers=${this._relay}`);
+    if (this._transport) args.push(`--transport=${this._transport}`);
+    if (this._namespace) args.push(`--namespace=${this._namespace}`);
 
     const child = execFile(binary, args, {
       env: { ...process.env, AGENTANYCAST_STORE_PATH: this._storePath },
